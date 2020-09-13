@@ -1,7 +1,7 @@
 EXE := cryptopass
 IMAGE := cryptopass
 TARGET := distr
-VERSION := $(shell git describe --tags --always --dirty)
+VERSION := $(shell git describe --tags --always)
 TAG := $(VERSION)
 REGISTRY := cryptorities
 PWD := $(shell pwd)
