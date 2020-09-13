@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cryptorities/cryptopass/pkg/app"
 	"github.com/cryptorities/cryptopass/pkg/crypto"
 	"github.com/cryptorities/cryptopass/pkg/util"
 	"github.com/pkg/errors"
@@ -28,7 +27,7 @@ func (t *verifyCommand) Run(args []string) error {
 	username := args[0]
 	token := args[1]
 
-	valid, expiration, err := crypto.Verify(username, token, app.IssueSep, util.PromptPublicKey)
+	valid, expiration, err := crypto.VerifyIssued(username, token, util.PromptPublicKey)
 	if err != nil {
 		return err
 	}
@@ -38,7 +37,7 @@ func (t *verifyCommand) Run(args []string) error {
 		return nil
 	}
 
-	valid, expiration, err = crypto.Verify(username, token, app.RevokeSep, util.PromptPublicKey)
+	valid, expiration, err = crypto.VerifyRevoked(username, token, util.PromptPublicKey)
 	if err != nil {
 		return err
 	}

@@ -19,6 +19,14 @@ import (
 type PublicKeyProvider func() ([]byte, error)
 type PrivateKeyProvider func() ([]byte, error)
 
+func Issue(username, expirationDate string, privateKeyProv PrivateKeyProvider) (string, error) {
+	return Sign(username, expirationDate, app.IssueSep, privateKeyProv)
+}
+
+func Revoke(username, expirationDate string, privateKeyProv PrivateKeyProvider) (string, error) {
+	return Sign(username, expirationDate, app.RevokeSep, privateKeyProv)
+}
+
 func Sign(username, date, sep string, privateKeyProv PrivateKeyProvider) (string, error) {
 
 	rig := username
@@ -64,6 +72,14 @@ func Sign(username, date, sep string, privateKeyProv PrivateKeyProvider) (string
 
 	return fmt.Sprintf("%s.%d", sigBase, days), nil
 
+}
+
+func VerifyIssued(username string, token string, publicKeyProv PublicKeyProvider) (bool, string, error) {
+	return Verify(username, token, app.IssueSep, publicKeyProv)
+}
+
+func VerifyRevoked(username string, token string, publicKeyProv PublicKeyProvider) (bool, string, error) {
+	return Verify(username, token, app.RevokeSep, publicKeyProv)
 }
 
 func Verify(username string, token string, sep string, publicKeyProv PublicKeyProvider) (bool, string, error) {

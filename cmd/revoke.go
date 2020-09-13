@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/cryptorities/cryptopass/pkg/app"
 	"github.com/cryptorities/cryptopass/pkg/crypto"
 	"github.com/cryptorities/cryptopass/pkg/util"
 	"github.com/pkg/errors"
@@ -25,9 +24,9 @@ func (t *revokeCommand) Run(args []string) error {
 	}
 
 	username := args[0]
-	date := args[1]
+	expirationDate := args[1]
 
-	token, err := crypto.Sign(username, date, app.RevokeSep, util.PromptPrivateKey)
+	token, err := crypto.Revoke(username, expirationDate, util.PromptPrivateKey)
 	if err != nil {
 		return err
 	}
