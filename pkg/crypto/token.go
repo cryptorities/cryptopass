@@ -16,8 +16,8 @@ import (
 	Alex Shvid
  */
 
-type PublicKeyProvider func() ([]byte, error)
-type PrivateKeyProvider func() ([]byte, error)
+type PublicKeyProvider func() (string, error)
+type PrivateKeyProvider func() (string, error)
 
 func Issue(username, expirationDate string, privateKeyProv PrivateKeyProvider) (string, error) {
 	return Sign(username, expirationDate, app.IssueSep, privateKeyProv)
@@ -57,7 +57,12 @@ func Sign(username, date, sep string, privateKeyProv PrivateKeyProvider) (string
 
 	//fmt.Printf("Signing rig='%s' days=%d, signingString='%s'\n", rig, days, signingString)
 
-	privateKey, err := privateKeyProv()
+	privateKeyEncoded, err := privateKeyProv()
+	if err != nil {
+		return "", err
+	}
+
+	privateKey, err := app.Encoding.DecodeString(privateKeyEncoded)
 	if err != nil {
 		return "", err
 	}
@@ -126,7 +131,12 @@ func Verify(username string, token string, sep string, publicKeyProv PublicKeyPr
 
 	//fmt.Printf("Verifying rig='%s' days=%d, signingString='%s'\n", rig, days, signingString)
 
-	publicKey, err := publicKeyProv()
+	publicKeyEncoded, err := publicKeyProv()
+	if err != nil {
+		return false, expirationFmt, err
+	}
+
+	publicKey, err := app.Encoding.DecodeString(publicKeyEncoded)
 	if err != nil {
 		return false, expirationFmt, err
 	}

@@ -1,42 +1,31 @@
 package util
 
 import (
-	"github.com/cryptorities/cryptopass/pkg/app"
 	"os"
 )
 
-var PrivateKey, _ = app.Encoding.DecodeString(os.Getenv("CRYPTOPASS_PRIVATE_KEY"))
-var PublicKey, _ = app.Encoding.DecodeString(os.Getenv("CRYPTOPASS_PUBLIC_KEY"))
+var PrivateKey = os.Getenv("CRYPTOPASS_PRIVATE_KEY")
+var PublicKey = os.Getenv("CRYPTOPASS_PUBLIC_KEY")
 
 
-func PromptPrivateKey() ([]byte, error) {
+func PromptPrivateKey() (string, error) {
 
 	if len(PrivateKey)> 0 {
 		return PrivateKey, nil
 	}
 
-	privateKeyHex := PromptPassword("Enter Private Key: ")
+	PrivateKey = PromptPassword("Enter Private Key: ")
 
-	privateKey, err := app.Encoding.DecodeString(privateKeyHex)
-	if err != nil {
-		return nil, err
-	}
-
-	return privateKey, nil
+	return PrivateKey, nil
 }
 
-func PromptPublicKey() ([]byte, error) {
+func PromptPublicKey() (string, error) {
 
 	if len(PublicKey)> 0 {
 		return PublicKey, nil
 	}
 
-	publicKeyHex := PromptPassword("Enter Public Key: ")
+	PublicKey = PromptPassword("Enter Public Key: ")
 
-	publicKey, err := app.Encoding.DecodeString(publicKeyHex)
-	if err != nil {
-		return nil, err
-	}
-
-	return publicKey, nil
+	return PublicKey, nil
 }
