@@ -35,18 +35,53 @@ func EncryptFile(inputFile, outputFile string, publicKeyProv PublicKeyProvider) 
 		return 0, err
 	}
 
-	publicKeyEncoded, err := publicKeyProv()
+	content, err := EncryptData(fileContent, publicKeyProv)
 	if err != nil {
 		return 0, err
+	}
+
+	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
+}
+
+func EncryptStream(inputStream io.ReadCloser, outputStream io.WriteCloser, publicKeyProv PublicKeyProvider) (int, error) {
+
+	fileContent, err := ioutil.ReadAll(inputStream)
+	if err != nil {
+		return 0, err
+	}
+
+	defer inputStream.Close()
+
+	content, err := EncryptData(fileContent, publicKeyProv)
+	if err != nil {
+		return 0, err
+	}
+
+	nw, err := outputStream.Write(content)
+	defer outputStream.Close()
+
+	if nw < len(content) && err == nil {
+		err = errors.New("invalid write")
+	}
+
+	return nw, err
+
+}
+
+func EncryptData(fileContent []byte, publicKeyProv PublicKeyProvider) ([]byte, error) {
+
+	publicKeyEncoded, err := publicKeyProv()
+	if err != nil {
+		return nil, err
 	}
 
 	publicKey, err := app.Encoding.DecodeString(publicKeyEncoded)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if len(publicKey) != ed25519.PublicKeySize {
-		return 0, errors.Errorf("invalid ed25519 public key len %d", len(publicKey))
+		return nil, errors.Errorf("invalid ed25519 public key len %d", len(publicKey))
 	}
 
 	var edwardsPublicKey [32]byte
@@ -54,15 +89,11 @@ func EncryptFile(inputFile, outputFile string, publicKeyProv PublicKeyProvider) 
 
 	var curvePublicKey [32]byte
 	if !util.PublicKeyToCurve25519(&curvePublicKey, &edwardsPublicKey) {
-		return 0, errors.New("can not convert ed25519 public key to curve25519 public key")
+		return nil, errors.New("can not convert ed25519 public key to curve25519 public key")
 	}
 
-	content, err := encrypt(&curvePublicKey, fileContent)
-	if err != nil {
-		return 0, err
-	}
+	return Encrypt(&curvePublicKey, fileContent)
 
-	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
 }
 
 func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider) (int, error) {
@@ -72,18 +103,52 @@ func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider
 		return 0, err
 	}
 
-	privateKeyEncoded, err := privateKeyProv()
+	content, err := DecryptData(fileContent, privateKeyProv)
 	if err != nil {
 		return 0, err
+	}
+
+	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
+}
+
+func DecryptStream(inputStream io.ReadCloser, outputStream io.WriteCloser, privateKeyProv PrivateKeyProvider) (int, error) {
+
+	fileContent, err := ioutil.ReadAll(inputStream)
+	if err != nil {
+		return 0, err
+	}
+
+	defer inputStream.Close()
+
+	content, err := DecryptData(fileContent, privateKeyProv)
+	if err != nil {
+		return 0, err
+	}
+
+	nw, err := outputStream.Write(content)
+	defer outputStream.Close()
+
+	if nw < len(content) && err == nil {
+		err = errors.New("invalid write")
+	}
+
+	return nw, err
+}
+
+func DecryptData(fileContent []byte, privateKeyProv PrivateKeyProvider) ([]byte, error) {
+
+	privateKeyEncoded, err := privateKeyProv()
+	if err != nil {
+		return nil, err
 	}
 
 	privateKey, err := app.Encoding.DecodeString(privateKeyEncoded)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if len(privateKey) != ed25519.PrivateKeySize {
-		return 0, errors.Errorf("invalid ed25519 private key len %d", len(privateKey))
+		return nil, errors.Errorf("invalid ed25519 private key len %d", len(privateKey))
 	}
 
 	var edwardsPrivateKey [64]byte
@@ -95,18 +160,18 @@ func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider
 	// clean
 	copy(edwardsPrivateKey[:], zero64[:])
 
-	content, err := decrypt(&curvePrivateKey, fileContent)
+	content, err := Decrypt(&curvePrivateKey, fileContent)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	// clean
 	copy(curvePrivateKey[:], zero32[:])
 
-	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
+	return content, err
 }
 
-func encrypt(recipient *[32]byte, content []byte) ([]byte, error) {
+func Encrypt(recipient *[32]byte, content []byte) ([]byte, error) {
 
 	boxPublicKey, boxPrivateKey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
@@ -124,7 +189,7 @@ func encrypt(recipient *[32]byte, content []byte) ([]byte, error) {
 
 }
 
-func decrypt(privateKey *[32]byte, content []byte) ([]byte, error) {
+func Decrypt(privateKey *[32]byte, content []byte) ([]byte, error) {
 
 	if len(content) < PublicKeySize + NonceSize {
 		return nil, errors.Errorf("insufficient file size %d", len(content))
