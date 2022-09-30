@@ -16,6 +16,10 @@ func (t *versionCommand) Desc() string {
 	return "show version"
 }
 
+func (t *versionCommand) Usage() string {
+	return "version"
+}
+
 func (t *versionCommand) Run(args []string) error {
 
 	appInfo := app.GetAppInfo()

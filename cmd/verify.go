@@ -18,6 +18,10 @@ func (t *verifyCommand) Desc() string {
 	return "verify token with expiration date"
 }
 
+func (t *verifyCommand) Usage() string {
+	return "revoke username token"
+}
+
 func (t *verifyCommand) Run(args []string) error {
 
 	if len(args) < 2 {

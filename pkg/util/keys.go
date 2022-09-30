@@ -14,7 +14,7 @@ func PromptPrivateKey() (string, error) {
 		return PrivateKey, nil
 	}
 
-	PrivateKey = PromptPassword("Enter Private Key: ")
+	PrivateKey = PromptPassword("Enter Your Private Key: ")
 
 	return PrivateKey, nil
 }
@@ -25,7 +25,11 @@ func PromptPublicKey() (string, error) {
 		return PublicKey, nil
 	}
 
-	PublicKey = PromptPassword("Enter Public Key: ")
+	PublicKey = PromptPassword("Enter Your Public Key: ")
 
 	return PublicKey, nil
+}
+
+func PromptRecipientPublicKey() (string, error) {
+	return PromptPassword("Enter Recipient Public Key: "), nil
 }

@@ -17,6 +17,10 @@ func (t *revokeCommand) Desc() string {
 	return "revoke token with expiration date"
 }
 
+func (t *revokeCommand) Usage() string {
+	return "revoke username expirationDate"
+}
+
 func (t *revokeCommand) Run(args []string) error {
 
 	if len(args) < 2 {

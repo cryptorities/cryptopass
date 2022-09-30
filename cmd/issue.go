@@ -17,6 +17,10 @@ func (t *issueCommand) Desc() string {
 	return "issue token with expiration date"
 }
 
+func (t *issueCommand) Usage() string {
+	return "issue username expirationDate"
+}
+
 func (t *issueCommand) Run(args []string) error {
 
 	if len(args) < 2 {

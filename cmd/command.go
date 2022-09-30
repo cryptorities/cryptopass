@@ -16,6 +16,9 @@ type commandFace interface {
 	Run(args []string) error
 
 	Desc() string
+
+	Usage() string
+
 }
 
 var allCommands = map[string]commandFace{
@@ -29,6 +32,10 @@ var allCommands = map[string]commandFace{
 	"revoke": &revokeCommand{},
 
 	"verify": &verifyCommand{},
+
+	"enc": &encCommand{},
+
+	"dec": &decCommand{},
 
 	"help": &helpCommand{},
 }
@@ -47,7 +54,7 @@ func printUsage() {
 	fmt.Printf("Usage: %s [command]\n", app.ExecutableName)
 
 	for name, command := range allCommands {
-		fmt.Printf("    %s - %s\n", name, command.Desc())
+		fmt.Printf("    %s - %s\tUsage: ./%s %s\n", name, command.Desc(), app.ExecutableName, command.Usage())
 	}
 
 	fmt.Println("Flags:")

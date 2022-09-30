@@ -42,4 +42,16 @@ cryptopass.exe revoke username YYY-MM-DD
 
 Revoke tokens must be stored on server and applied on authentication after successful verification.
 
+Encrypting file for recipient:
+```
+cryptopass.exe enc input_file [output_file]
+It will prompt recipient's public key
+```
+If output_file is not defined, it would be saved under input_file.cp
 
+Decrypting received file:
+```
+cryptopass.exe dec input_file [output_file]
+It will prompt your private key if CRYPTOPASS_PRIVATE_KEY env not defined
+```
+If output_file is not defined and ending with `.cp`, it would be saved under input_file[:-3]
