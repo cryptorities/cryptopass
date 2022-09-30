@@ -47,8 +47,8 @@ func Sign(username, date, sep string, privateKeyProv PrivateKeyProvider) (string
 		return "", errors.Errorf("invalid expiration date '%s', %v", date, err)
 	}
 
-	if datetime.Before(time.Now()) {
-		return "", errors.Errorf("expiration date is before than now '%s'", datetime.String())
+	if sep == app.IssueSep && datetime.Before(time.Now()) {
+		return "", errors.Errorf("expiration date '%s' is before than now", datetime.String())
 	}
 
 	days := util.DaysOffset(&datetime)

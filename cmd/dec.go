@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/cryptorities/cryptopass/pkg/crypto"
 	"github.com/cryptorities/cryptopass/pkg/util"
 	"github.com/pkg/errors"
@@ -40,11 +41,11 @@ func (t *decCommand) Run(args []string) error {
 		return errors.New("Usage: ./cryptopass dec input_file output_file")
 	}
 
-	err := crypto.DecryptFile(inputFile, outputFile, util.PromptPrivateKey)
+	n, err := crypto.DecryptFile(inputFile, outputFile, util.PromptPrivateKey)
 	if err != nil {
 		return err
 	}
 
-	println("Done.")
+	fmt.Printf("Written %d bytes.", n)
 	return nil
 }

@@ -28,25 +28,25 @@ var (
   	zero64 [64]byte
 )
 
-func EncryptFile(inputFile, outputFile string, publicKeyProv PublicKeyProvider) error {
+func EncryptFile(inputFile, outputFile string, publicKeyProv PublicKeyProvider) (int, error) {
 
 	fileContent, err := ioutil.ReadFile(inputFile)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	publicKeyEncoded, err := publicKeyProv()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	publicKey, err := app.Encoding.DecodeString(publicKeyEncoded)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if len(publicKey) != ed25519.PublicKeySize {
-		return errors.Errorf("invalid ed25519 public key len %d", len(publicKey))
+		return 0, errors.Errorf("invalid ed25519 public key len %d", len(publicKey))
 	}
 
 	var edwardsPublicKey [32]byte
@@ -54,36 +54,36 @@ func EncryptFile(inputFile, outputFile string, publicKeyProv PublicKeyProvider) 
 
 	var curvePublicKey [32]byte
 	if !util.PublicKeyToCurve25519(&curvePublicKey, &edwardsPublicKey) {
-		return errors.New("can not convert ed25519 public key to curve25519 public key")
+		return 0, errors.New("can not convert ed25519 public key to curve25519 public key")
 	}
 
 	content, err := encrypt(&curvePublicKey, fileContent)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return ioutil.WriteFile(outputFile, content, os.FileMode(0660))
+	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
 }
 
-func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider) error {
+func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider) (int, error) {
 
 	fileContent, err := ioutil.ReadFile(inputFile)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	privateKeyEncoded, err := privateKeyProv()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	privateKey, err := app.Encoding.DecodeString(privateKeyEncoded)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if len(privateKey) != ed25519.PrivateKeySize {
-		return errors.Errorf("invalid ed25519 private key len %d", len(privateKey))
+		return 0, errors.Errorf("invalid ed25519 private key len %d", len(privateKey))
 	}
 
 	var edwardsPrivateKey [64]byte
@@ -97,13 +97,13 @@ func DecryptFile(inputFile, outputFile string, privateKeyProv PrivateKeyProvider
 
 	content, err := decrypt(&curvePrivateKey, fileContent)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// clean
 	copy(curvePrivateKey[:], zero32[:])
 
-	return ioutil.WriteFile(outputFile, content, os.FileMode(0660))
+	return len(content), ioutil.WriteFile(outputFile, content, os.FileMode(0660))
 }
 
 func encrypt(recipient *[32]byte, content []byte) ([]byte, error) {

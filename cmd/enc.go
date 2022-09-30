@@ -38,11 +38,11 @@ func (t *encCommand) Run(args []string) error {
 		outputFile = fmt.Sprintf("%s.cp", inputFile)
 	}
 
-	err := crypto.EncryptFile(inputFile, outputFile, util.PromptRecipientPublicKey)
+	n, err := crypto.EncryptFile(inputFile, outputFile, util.PromptRecipientPublicKey)
 	if err != nil {
 		return err
 	}
 
-	println("Done.")
+	fmt.Printf("Written %d bytes.", n)
 	return nil
 }

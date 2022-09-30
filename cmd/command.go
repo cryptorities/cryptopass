@@ -11,6 +11,8 @@ import (
 	Alex Shvid
 */
 
+var DefaultCommand = []string { "ui" }
+
 type commandFace interface {
 
 	Run(args []string) error
@@ -36,6 +38,8 @@ var allCommands = map[string]commandFace{
 	"enc": &encCommand{},
 
 	"dec": &decCommand{},
+
+	"ui": &uiCommand{},
 
 	"help": &helpCommand{},
 }
@@ -65,6 +69,9 @@ func printUsage() {
 func Run(args []string) int {
 
 	args = preprocessArgs(args)
+	if len(args) == 0 {
+		args = DefaultCommand
+	}
 
 	if len(args) >= 1 {
 

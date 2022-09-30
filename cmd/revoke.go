@@ -14,7 +14,7 @@ type revokeCommand struct {
 }
 
 func (t *revokeCommand) Desc() string {
-	return "revoke token with expiration date"
+	return "revoke token with expiration date in format YYYY-mm-dd"
 }
 
 func (t *revokeCommand) Usage() string {

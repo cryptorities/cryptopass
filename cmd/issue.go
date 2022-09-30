@@ -14,7 +14,7 @@ type issueCommand struct {
 }
 
 func (t *issueCommand) Desc() string {
-	return "issue token with expiration date"
+	return "issue token with expiration date in format YYYY-mm-dd"
 }
 
 func (t *issueCommand) Usage() string {

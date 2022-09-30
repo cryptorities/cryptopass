@@ -47,7 +47,7 @@ func (t *verifyCommand) Run(args []string) error {
 	}
 
 	if valid {
-		fmt.Printf("revoked at %s\n", expiration)
+		fmt.Printf("revoked on %s\n", expiration)
 		return nil
 	}
 
