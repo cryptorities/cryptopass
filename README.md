@@ -23,11 +23,23 @@ Token generated only from second part.
     PrivateKey on token/password issue tool
 ```
 
-### User Interface
+### GUI User Interface
 
 Cryptopass has integrated user GUI interface for easy key and end-to-end encryption operation.
 
+<img src="https://github.com/cryptorities/cryptopass/releases/download/v1.4.0/crypto-pass-about.png" alt="cryptopass gui about"/>
 
+
+### Build
+
+In order to build this tools you need to install golang ideally 1.17 version.
+And then run make command (or build.cmd for windows) 
+
+```
+make
+```
+
+### Usage
 
 Generate token key-pair:
 ```
