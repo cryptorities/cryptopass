@@ -11,13 +11,23 @@ Token generated only from second part.
 * days - is the number of days starting since Jan 1, 2020 00:00:00 UFC 
 * separator: `*` is for issue token, '/' is for revoke token.
 
-Formulas:
+#### Formulas
+```
     Sign(secondPart + sep + days, PrivateKey)
     Verify(secondPart + sep + days, token, PublicKey) < Now   
+```
 
-Deployment:
+#### Deployment
+```
     PublicKey on server
     PrivateKey on token/password issue tool
+```
+
+### User Interface
+
+Cryptopass has integrated user GUI interface for easy key and end-to-end encryption operation.
+
+
 
 Generate token key-pair:
 ```
